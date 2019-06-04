@@ -14,6 +14,7 @@ else:
     reload(sys)
     sys.setdefaultencoding("utf8")
 
+
 def parse_args():
     parser = argparse.ArgumentParser("Run inference.")
     parser.add_argument(
@@ -68,6 +69,7 @@ def get_real_tag(origin_tag):
         return "O"
     return origin_tag[0:len(origin_tag) - 2]
 
+
 def to_lodtensor(data, place):
     seq_lens = [len(seq) for seq in data]
     cur_len = 0
@@ -82,19 +84,20 @@ def to_lodtensor(data, place):
     res.set_lod([lod])
     return res
 
+
 def infer(args):
     id2word_dict = reader.load_dict(args.word_dict_path)
-    word2id_dict = reader.load_reverse_dict(args.word_dict_path) 
+    word2id_dict = reader.load_reverse_dict(args.word_dict_path)
 
     id2label_dict = reader.load_dict(args.label_dict_path)
     label2id_dict = reader.load_reverse_dict(args.label_dict_path)
     q2b_dict = reader.load_dict(args.word_rep_dict_path)
     test_data = paddle.batch(
-                    reader.test_reader(args.test_data_dir,
-                        word2id_dict,
-                        label2id_dict,
-                        q2b_dict),
-                    batch_size = args.batch_size)
+        reader.test_reader(args.test_data_dir,
+                           word2id_dict,
+                           label2id_dict,
+                           q2b_dict),
+        batch_size=args.batch_size)
     place = fluid.CPUPlace()
     exe = fluid.Executor(place)
 
@@ -107,9 +110,9 @@ def infer(args):
             word_idx = to_lodtensor([x[0] for x in data], place)
             word_list = [x[1] for x in data]
             (crf_decode, ) = exe.run(inference_program,
-                                 feed={"word":word_idx},
-                                 fetch_list=fetch_targets,
-                                 return_numpy=False)
+                                     feed={"word": word_idx},
+                                     fetch_list=fetch_targets,
+                                     return_numpy=False)
             lod_info = (crf_decode.lod())[0]
             np_data = np.array(crf_decode)
             assert len(data) == len(lod_info) - 1
@@ -122,7 +125,7 @@ def infer(args):
                 cur_full_tag = ""
                 words = word_list[sen_index]
                 for tag_index in range(lod_info[sen_index],
-                                        lod_info[sen_index + 1]):
+                                       lod_info[sen_index + 1]):
                     cur_word = words[word_index]
                     cur_tag = id2label_dict[str(np_data[tag_index][0])]
                     if cur_tag.endswith("-B") or cur_tag.endswith("O"):
@@ -133,12 +136,13 @@ def infer(args):
                     else:
                         cur_full_word += cur_word
                     word_index += 1
-                outstr += cur_full_word + u"/" + cur_full_tag + u" "    
+                outstr += cur_full_word + u"/" + cur_full_tag + u" "
                 outstr = outstr.strip()
                 full_out_str += outstr + u"\n"
             print(full_out_str.strip(), file=sys.stdout)
 
+
 if __name__ == "__main__":
     args = parse_args()
-    print_arguments(args)
+    # print_arguments(args)
     infer(args)
