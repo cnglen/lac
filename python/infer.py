@@ -7,6 +7,7 @@ import argparse
 import time
 import sys
 import io
+import tqdm
 
 if sys.version_info > (3,):
     sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
@@ -105,7 +106,7 @@ def infer(args):
     with fluid.scope_guard(inference_scope):
         [inference_program, feed_target_names,
          fetch_targets] = fluid.io.load_inference_model(args.model_path, exe)
-        for data in test_data():
+        for data in tqdm.tqdm(test_data(), desc="tokenization@BaiduTokenizer"):
             full_out_str = ""
             word_idx = to_lodtensor([x[0] for x in data], place)
             word_list = [x[1] for x in data]
@@ -117,15 +118,13 @@ def infer(args):
             np_data = np.array(crf_decode)
             assert len(data) == len(lod_info) - 1
             for sen_index in range(len(data)):
-                assert len(data[sen_index][0]) == lod_info[
-                    sen_index + 1] - lod_info[sen_index]
+                assert len(data[sen_index][0]) == lod_info[sen_index + 1] - lod_info[sen_index]
                 word_index = 0
                 outstr = ""
                 cur_full_word = ""
                 cur_full_tag = ""
                 words = word_list[sen_index]
-                for tag_index in range(lod_info[sen_index],
-                                       lod_info[sen_index + 1]):
+                for tag_index in range(lod_info[sen_index], lod_info[sen_index + 1]):
                     cur_word = words[word_index]
                     cur_tag = id2label_dict[str(np_data[tag_index][0])]
                     if cur_tag.endswith("-B") or cur_tag.endswith("O"):

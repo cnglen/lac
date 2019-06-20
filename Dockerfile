@@ -28,4 +28,4 @@ CMD []
 # docker build --tag=paddle:lac .
 
 # How top run? YOUR_DATA_DIRECTORY/your_input_data.txt
-# docker run -it -v YOUR_DATA_DIRECTORY:/lac_space paddle:lac_s4 -if /lac_space/your_input_data.txt
+# docker run -it -v YOUR_DATA_DIRECTORY:/lac_space paddle:lac -if /lac_space/your_input_data.txt

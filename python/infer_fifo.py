@@ -20,6 +20,7 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("-if", "--input-file", help="path of input file")
     parser.add_argument("-of", "--output-file", help="path of output file", default=None)
+    parser.add_argument("-bs", "--batch-size", help="batch size", default=16, type=int)
     args = parser.parse_args()
     input_file = os.path.abspath(args.input_file)
     output_file = os.path.abspath(args.input_file) + "_lac_output.txt" if args.output_file is None else args.output_file
@@ -32,9 +33,7 @@ def main():
         raise ValueError("确保input_file所在文件夹只有一个文件")
 
     os.chdir(os.path.expanduser("~/lac"))  # 假设lac仓库在home目录
-    cmd = "python python/infer.py --batch_size 1 --test_data_dir {}".format(input_data_dir)
-    # print(cmd)
-    # print(output_file)
+    cmd = "python python/infer.py --batch_size {} --test_data_dir {}".format(args.batch_size, input_data_dir)
     with open(output_file, "w") as f_out:
         subprocess.call(shlex.split(cmd), stdout=f_out)
 
