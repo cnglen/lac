@@ -37,6 +37,24 @@ def main():
     with open(output_file, "w") as f_out:
         subprocess.call(shlex.split(cmd), stdout=f_out)
 
+    # 对剩下的尾巴进行分词
+    n_doc = sum(1 for _ in open(args.input_file))
+    n_doc_remaining = n_doc % args.batch_size
+    tmp_remaining_input_file = "/tmp/lac_remaining_input/input.txt"
+    tmp_remaining_output_file = "/tmp/lac_remaining_output/output.txt"
+    os.makedirs(os.path.dirname(tmp_remaining_input_file), exist_ok=True)
+    os.makedirs(os.path.dirname(tmp_remaining_output_file), exist_ok=True)
+
+    cmd_tail = "tail -n {} {} > {}".format(args.input_file, n_doc_remaining, tmp_remaining_input_file)
+    subprocess.call(shlex.split(cmd_tail))
+
+    cmd2 = "python python/infer.py --batch_size {} --test_data_dir {}".format(1, os.path.dirname(tmp_remaining_input_file))
+    with open(tmp_remaining_output_file, "w") as f_out:
+        subprocess.call(shlex.split(cmd2), stdout=f_out)
+
+    cmd_merge = "cat {} >> {}".format(tmp_remaining_output_file, output_file)
+    subprocess.call(shlex.split(cmd_merge))
+
 
 if __name__ == '__main__':
     main()
