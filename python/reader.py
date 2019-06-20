@@ -5,6 +5,7 @@ import os
 import __future__
 import io
 
+
 def file_reader(file_dir,
                 word2id_dict,
                 label2id_dict,
@@ -15,6 +16,7 @@ def file_reader(file_dir,
     """
     word_dict_len = max(map(int, word2id_dict.values())) + 1
     label_dict_len = max(map(int, label2id_dict.values())) + 1
+
     def reader():
         """
         the data generator
@@ -24,7 +26,8 @@ def file_reader(file_dir,
             for filename in files:
                 if not filename.startswith(filename_feature):
                     continue
-                for line in io.open(os.path.join(root, filename), 'r', encoding='utf8'):
+                n_line = sum(1 for 1 in open(os.path.join(root, filename), "rb"))
+                for line in tqdm.tqdm(io.open(os.path.join(root, filename), 'r', encoding='utf8'), desc="tokenization@lac@{} ".format(filename), total=n_line):
                     index += 1
                     bad_line = False
                     line = line.strip("\n")
@@ -52,9 +55,10 @@ def file_reader(file_dir,
                         else:
                             target_idx.append(int(label2id_dict["O"]))
                     if len(word_idx) != len(target_idx):
-                        continue             
+                        continue
                     yield word_idx, target_idx
     return reader
+
 
 def test_reader(file_dir,
                 word2id_dict,
@@ -66,6 +70,7 @@ def test_reader(file_dir,
     """
     word_dict_len = max(map(int, word2id_dict.values())) + 1
     label_dict_len = max(map(int, label2id_dict.values())) + 1
+
     def reader():
         """
         the data generator

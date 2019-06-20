@@ -102,22 +102,23 @@ def infer(args):
     place = fluid.CPUPlace()
     exe = fluid.Executor(place)
 
-    # size of batch for display in tqdm
-    __test_data = paddle.batch(
-        reader.test_reader(args.test_data_dir,
-                           word2id_dict,
-                           label2id_dict,
-                           q2b_dict),
-        batch_size=args.batch_size)
-    __n = sum(1 for q in __test_data())
-    del __test_data
+    # # size of batch for display in tqdm
+    # __test_data = paddle.batch(
+    #     reader.test_reader(args.test_data_dir,
+    #                        word2id_dict,
+    #                        label2id_dict,
+    #                        q2b_dict),
+    #     batch_size=args.batch_size)
+    # __n = sum(1 for q in __test_data())
+    # del __test_data
 
     inference_scope = fluid.core.Scope()
     with fluid.scope_guard(inference_scope):
         [inference_program, feed_target_names,
          fetch_targets] = fluid.io.load_inference_model(args.model_path, exe)
 
-        for data in tqdm.tqdm(test_data(), desc="tokenization@BaiduTokenizer", total=__n):
+        # for data in tqdm.tqdm(test_data(), desc="tokenization@BaiduTokenizer", total=__n):
+        for data in test_data():
             full_out_str = ""
             word_idx = to_lodtensor([x[0] for x in data], place)
             word_list = [x[1] for x in data]
