@@ -42,8 +42,8 @@ def main():
     n_doc_remaining = n_doc % args.batch_size
     tmp_remaining_input_file = "/tmp/lac_remaining_input/input.txt"
     tmp_remaining_output_file = "/tmp/lac_remaining_output/output.txt"
-    os.makedirs(os.path.dirname(tmp_remaining_input_file), exist_ok=True)
-    os.makedirs(os.path.dirname(tmp_remaining_output_file), exist_ok=True)
+    os.makedirs(os.path.dirname(tmp_remaining_input_file))
+    os.makedirs(os.path.dirname(tmp_remaining_output_file))
 
     cmd_tail = "tail -n {} {} > {}".format(args.input_file, n_doc_remaining, tmp_remaining_input_file)
     subprocess.call(shlex.split(cmd_tail))
