@@ -102,7 +102,7 @@ def infer(args):
     place = fluid.CPUPlace()
     exe = fluid.Executor(place)
 
-    # 计算data的数目,用于tqmd显示
+    # size of batch for display in tqdm
     __test_data = paddle.batch(
         reader.test_reader(args.test_data_dir,
                            word2id_dict,
