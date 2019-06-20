@@ -52,8 +52,8 @@ def main():
     with open(tmp_remaining_output_file, "w") as f_out:
         subprocess.call(shlex.split(cmd2), stdout=f_out)
 
-    cmd_merge = "cat {} >> {}".format(tmp_remaining_output_file, output_file)
-    subprocess.call(shlex.split(cmd_merge))
+    with open(output_file, "a") as f_output, open(tmp_remaining_output_file, "r") as f:
+        f_output.writelines(f.readlines())
 
 
 if __name__ == '__main__':
