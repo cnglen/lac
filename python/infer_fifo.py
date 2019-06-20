@@ -45,8 +45,10 @@ def main():
     os.makedirs(os.path.dirname(tmp_remaining_input_file))
     os.makedirs(os.path.dirname(tmp_remaining_output_file))
 
-    cmd_tail = "tail -n {} {} > {}".format(args.input_file, n_doc_remaining, tmp_remaining_input_file)
-    subprocess.call(shlex.split(cmd_tail))
+    with open(args.input_file, "r") as f_all, open(tmp_remaining_input_file, "w") as f_tmp:
+        for i, r in enumerate(f_all):
+            if i >= n_doc - n_doc_remaining:
+                f_tmp.write(r)
 
     cmd2 = "python python/infer.py --batch_size {} --test_data_dir {}".format(1, os.path.dirname(tmp_remaining_input_file))
     with open(tmp_remaining_output_file, "w") as f_out:
