@@ -4,6 +4,7 @@ The file_reader converts raw corpus to input.
 import os
 import __future__
 import io
+import tqdm
 
 
 def file_reader(file_dir,
@@ -80,7 +81,9 @@ def test_reader(file_dir,
             for filename in files:
                 if not filename.startswith(filename_feature):
                     continue
-                for line in io.open(os.path.join(root, filename), 'r', encoding='utf8'):
+
+                n_line = sum(1 for _ in open(os.path.join(root, filename), "rb"))
+                for line in tqdm.tqdm(io.open(os.path.join(root, filename), 'r', encoding='utf8'), desc="tokenization@lac@{} ".format(filename), total=n_line):
                     index += 1
                     bad_line = False
                     line = line.strip("\n")
