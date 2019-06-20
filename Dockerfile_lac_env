@@ -1,0 +1,18 @@
+# Dockerfile for LAC-env: 需要git clone很多仓库,如果网速慢，很耗时。这个Dockerfile将耗时操作封装起来
+
+FROM paddle:dev
+
+RUN git clone https://github.com/PaddlePaddle/Paddle.git ~/Paddle && cd ~/Paddle && git checkout v0.14.0 && \
+    cd ~/Paddle && rm -rf cbuild && mkdir cbuild && cd cbuild && \
+    cmake -DCMAKE_BUILD_TYPE=Release -DWITH_MKLDNN=OFF -DWITH_GPU=ON -DWITH_FLUID_ONLY=ON .. && \
+    make -j 15
+
+RUN cd ~/Paddle && pip install cbuild/python/dist/paddlepaddle*.whl && \
+    cd ~/Paddle/cbuild && make -j 15 inference_lib_dist
+
+RUN cd /tmp && curl -s https://packagecloud.io/install/repositories/github/git-lfs/script.deb.sh > /tmp/script.deb.sh && \
+    bash script.deb.sh && \
+    apt-get install git-lfs && \
+    rm /tmp/script.deb.sh
+
+# docker build --tag=paddle:lac_env -f Dockerfile_lac_env .
