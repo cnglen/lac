@@ -30,7 +30,7 @@ def main():
     all_files = [e for e in glob.glob(os.path.join(input_data_dir, "*")) if not e.endswith("_lac_output.txt")]
 
     if len(all_files) > 1:
-        raise ValueError("确保input_file所在文件夹只有一个文件")
+        raise ValueError("确保input_file所在文件夹只有一个文件:{}".format(all_files))
 
     os.chdir(os.path.expanduser("~/lac"))  # 假设lac仓库在home目录
     cmd = "python python/infer.py --batch_size {} --test_data_dir {}".format(args.batch_size, input_data_dir)

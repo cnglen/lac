@@ -28,7 +28,7 @@ def file_reader(file_dir,
                 if not filename.startswith(filename_feature):
                     continue
                 n_line = sum(1 for _ in open(os.path.join(root, filename), "rb"))
-                for line in tqdm.tqdm(io.open(os.path.join(root, filename), 'r', encoding='utf8'), desc="tokenization@lac@{} ".format(filename), total=n_line):
+                for line in tqdm.tqdm(io.open(os.path.join(root, filename), 'r', encoding='utf8'), desc="tokenization@lacDocker@{} ".format(os.path.join(root, filename)), total=n_line):
                     index += 1
                     bad_line = False
                     line = line.strip("\n")
