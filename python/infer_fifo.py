@@ -40,22 +40,23 @@ def main():
     # 对剩下的尾巴进行分词
     n_doc = sum(1 for _ in open(args.input_file))
     n_doc_remaining = n_doc % args.batch_size
-    tmp_remaining_input_file = "/tmp/lac_remaining_input/input.txt"
-    tmp_remaining_output_file = "/tmp/lac_remaining_output/output.txt"
-    os.makedirs(os.path.dirname(tmp_remaining_input_file))
-    os.makedirs(os.path.dirname(tmp_remaining_output_file))
+    if n_doc_remaining > 0:
+        tmp_remaining_input_file = "/tmp/lac_remaining_input/input.txt"
+        tmp_remaining_output_file = "/tmp/lac_remaining_output/output.txt"
+        os.makedirs(os.path.dirname(tmp_remaining_input_file))
+        os.makedirs(os.path.dirname(tmp_remaining_output_file))
 
-    with open(args.input_file, "r") as f_all, open(tmp_remaining_input_file, "w") as f_tmp:
-        for i, r in enumerate(f_all):
-            if i >= n_doc - n_doc_remaining:
-                f_tmp.write(r)
+        with open(args.input_file, "r") as f_all, open(tmp_remaining_input_file, "w") as f_tmp:
+            for i, r in enumerate(f_all):
+                if i >= n_doc - n_doc_remaining:
+                    f_tmp.write(r)
 
-    cmd2 = "python python/infer.py --batch_size {} --test_data_dir {}".format(1, os.path.dirname(tmp_remaining_input_file))
-    with open(tmp_remaining_output_file, "w") as f_out:
-        subprocess.call(shlex.split(cmd2), stdout=f_out)
+        cmd2 = "python python/infer.py --batch_size {} --test_data_dir {}".format(1, os.path.dirname(tmp_remaining_input_file))
+        with open(tmp_remaining_output_file, "w") as f_out:
+            subprocess.call(shlex.split(cmd2), stdout=f_out)
 
-    with open(output_file, "a") as f_output, open(tmp_remaining_output_file, "r") as f:
-        f_output.writelines(f.readlines())
+        with open(output_file, "a") as f_output, open(tmp_remaining_output_file, "r") as f:
+            f_output.writelines(f.readlines())
 
 
 if __name__ == '__main__':
